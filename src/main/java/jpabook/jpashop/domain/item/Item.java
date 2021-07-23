@@ -1,7 +1,6 @@
 package jpabook.jpashop.domain.item;
 
 import jpabook.jpashop.domain.Category;
-import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.excpetion.NoEnoughtStockException;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +38,7 @@ public class Item {
      * stock 감소
      */
     public void removeStock(int quantity) {
-        int restStock = this.stockQuantity - quantity
+        int restStock = this.stockQuantity - quantity;
         if(restStock < 0) {
             throw new NoEnoughtStockException("need more stock");
         }
