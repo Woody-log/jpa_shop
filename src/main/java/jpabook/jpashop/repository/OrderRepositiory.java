@@ -1,6 +1,7 @@
 package jpabook.jpashop.repository;
 
 import jpabook.jpashop.domain.Order;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
 import jpabook.jpashop.service.OrderSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -62,5 +63,37 @@ public class OrderRepositiory {
         }
 
         return query.getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery() {
+        return em.createQuery(
+            "select o from Order o " +
+                    "join fetch o.member m " +
+                    "join fetch o.delivery d", Order.class).getResultList();
+    }
+
+    public List<Order> findAllWithItem() {
+
+        // 조인으로 중복된 order 빌생 시 distinct를 사용한다. 하지만 기존 query의 distinct랑은 다르게 엔티티별로 중복을 제거해줌.
+        // 단점 일대다 페치조인에서 페이징 불가능.
+        return em.createQuery(
+                "select distinct o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d " +
+                        " join fetch o.orderItems oi " +
+                        " join fetch oi.item i", Order.class)
+              //  .setFirstResult(1)
+              //  .setMaxResults(100)       // 설정 시 무시됌.
+                .getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                "select o from Order o " +
+                        "join fetch o.member m " +
+                        "join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 }
